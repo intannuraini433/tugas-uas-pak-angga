@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lowongan Pekerjaan</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Roboto+Mono&display=swap');
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    color: #f0f0f5;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  header {
+    position: sticky;
+    top: 0;
+    background: rgba(18, 33, 70, 0.95);
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 1000;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  }
+  header h1 {
+    font-weight: 700;
+    font-size: 1.8rem;
+    letter-spacing: 2px;
+    color: #ffde59;
+    user-select: none;
+  }
+  nav {
+    display: flex;
+    gap: 20px;
+  }
+  nav button {
+    background: transparent;
+    border: 2px solid #ffde59;
+    color: #ffde59;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  nav button:hover, nav button.active {
+    background-color: #ffde59;
+    color: #1e3c72;
+  }
+  main {
+    flex-grow: 1;
+    max-width: 1200px;
+    margin: 2rem auto 5rem;
+    padding: 0 1rem;
+    backdrop-filter: saturate(180%) blur(20px);
+    background: rgba(0,0,0,0.4);
+    border-radius: 15px;
+    box-shadow: 0 0 25px rgba(255,222,89,0.7);
+  }
+  .search-panel {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  .search-input, .filter-select, .filter-multi {
+    background: #1a2f59;
+    border: none;
+    border-radius: 8px;
+    color: #ffde59;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    flex-grow: 1;
+    min-width: 180px;
+    outline-offset: 3px;
+    transition: box-shadow 0.3s ease;
+  }
+  .search-input::placeholder {
+    color: #ddb117aa;
+  }
+  .search-input:focus, .filter-select:focus, .filter-multi:focus {
+    box-shadow: 0 0 15px 3px #ffde59aa;
+    outline: none;
+  }
+  .filter-multi {
+    font-family: 'Poppins', sans-serif;
+    height: 3.6rem;
+  }
+  .filters {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 2rem;
+  }
+  .filter-group {
+    background: #27406d;
+    border-radius: 16px;
+    padding: 1rem 1.25rem;
+    width: 220px;
+    max-height: 220px;
+    overflow-y: auto;
+    box-shadow: 0 0 15px #ffde59aa inset;
+  }
+  .filter-group h3 {
+    margin-top: 0;
+    margin-bottom: 0.75rem;
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: #ffd633;
+    text-align: center;
+    text-shadow: 0 0 6px #ffde59cc;
+  }
+  .filter-group label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1rem;
+    color: #ffe279cc;
+    padding: 0.25rem 0;
+    user-select: none;
+    transition: color 0.3s ease;
+  }
+  .filter-group label:hover {
+    color: #ffffffcc;
+  }
+  .filter-group input[type="checkbox"] {
+    accent-color: #ffde59;
+    width: 22px;
+    height: 22px;
+  }
+  .jobs-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(320px,1fr));
+    gap: 2rem;
+  }
+  .job-card {
+    background: linear-gradient(145deg, #0a1b39, #162b5b);
+    border: 2px solid transparent;
+    border-radius: 20px;
+    padding: 1.5rem;
+    box-shadow: 8px 8px 15px #0b1a37, -8px -8px 20px #1b3a72;
+    color: #ffde59;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: box-shadow 0.3s ease, border-color 0.3s ease;
+    cursor: pointer;
+  }
+  .job-card:hover, .job-card:focus-within {
+    border-color: #ffde59;
+    box-shadow: 0 0 40px #ffde59aa;
+  }
+  .job-header {
+    margin-bottom: 1rem;
+  }
+  .job-title {
+    font-weight: 700;
+    font-size: 1.5rem;
+    margin-bottom: 0.2rem;
+    text-shadow: 0 0 6px #fff45d;
+  }
+  .company-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #ffe777cc;
+    letter-spacing: 0.05em;
+  }
+  .job-info {
+    font-weight: 500;
+    font-size: 1rem;
+    color: #fff0a3;
+    margin: 0.8rem 0 1rem;
+    line-height: 1.3;
+  }
+  .job-info span {
+    display: inline-block;
+    margin-right: 1rem;
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 1.2rem;
+  }
+  .tag {
+    background: #ffde59;
+    color: #1e3c72;
+    font-weight: 700;
+    padding: 0.5rem 1.1rem;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    user-select: none;
+    text-shadow: 1px 1px 2px #887505bb;
+    box-shadow: 0 4px 10px #ffde59bb;
+    transition: background-color 0.3s ease;
+  }
+  .tag:hover {
+    background-color: #ffb300;
+    box-shadow: 0 6px 14px #ffb300dd;
+  }
+  .btn-apply, .btn-save {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    border-radius: 30px;
+    padding: 0.65rem 1.6rem;
+    border: none;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    display: inline-block;
+    text-align: center;
+    text-decoration: none;
+  }
+  .btn-apply {
+    background: #ffde59;
+    color: #1e3c72;
+    box-shadow: 0 6px 12px #ffde59aa;
+  }
+  .btn-apply:hover,
+  .btn-apply:focus {
+    background: #ffd500;
+    box-shadow: 0 8px 18px #ffd500cc;
+    outline: none;
+  }
+  .btn-save {
+    background: transparent;
+    color: #ffde59;
+    border: 2px solid #ffde59;
+    margin-top: auto;
+    align-self: flex-start;
+    box-shadow: 0 4px 12px #ffde59aa;
+  }
+  .btn-save.saved {
+    background: #ffd500;
+    color: #1e3c72;
+    box-shadow: 0 6px 18px #ffd500cc;
+  }
+  .btn-save:hover,
+  .btn-save.saved:hover,
+  .btn-save:focus {
+    outline: none;
+    background: #ffd500;
+    color: #1e3c72;
+    box-shadow: 0 10px 22px #ffd500ee;
+    border-color: #ffd500;
+  }
+  .pagination {
+    margin-top: 3rem;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+  }
+  .pagination button {
+    background: #1e3c72;
+    border: none;
+    color: #ffde59;
+    font-weight: 700;
+    font-size: 1.25rem;
+    padding: 0.6rem 1.2rem;
+    border-radius: 30px;
+    cursor: pointer;
+    box-shadow: 0 5px 15px #ffde59cc;
+    user-select: none;
+    transition: transform 0.25s, box-shadow 0.3s ease;
+  }
+  .pagination button:hover:not(:disabled),
+  .pagination button:focus:not(:disabled) {
+    background: #ffd500;
+    color: #1e3c72;
+    box-shadow: 0 8px 26px #ffd500cc;
+    outline: none;
+    transform: scale(1.05);
+  }
+  .pagination button:disabled {
+    opacity: 0.3;
+    cursor: default;
+    box-shadow: none;
+    transform: none;
+  }
+  .pagination button.current-page {
+    background: #ffd500;
+    color: #1e3c72;
+    cursor: default;
+    box-shadow: 0 8px 26px #ffd500cc;
+    transform: scale(1.05);
+  }
+  /* Modal */
+  .modal-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    backdrop-filter: blur(6px);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    overflow-y: auto;
+  }
+  .modal-backdrop.active {
+    display: flex;
+  }
+  .modal {
+    background: #1c2b57;
+    border-radius: 18px;
+    max-width: 720px;
+    width: 100%;
+    padding: 2.5rem 3rem;
+    color: #ffe;
+    box-shadow: 0 0 50px #ffd63fcc;
+    position: relative;
+  }
+  .modal h2 {
+    margin-top: 0;
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: #ffd63f;
+    text-shadow: 0 0 14px #ffea6da8;
+  }
+  .modal .company {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #f0e59c;
+    margin-bottom: 1rem;
+  }
+  .modal .job-info span {
+    display: inline-block;
+    margin-right: 2rem;
+    font-weight: 600;
+    font-size: 1.05rem;
+    color: #fff7b9;
+    user-select: text;
+  }
+  .modal .description {
+    white-space: pre-line;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin: 1.5rem 0 3rem 0;
+    color: #f9f3d2;
+  }
+  .modal .tags {
+    margin-bottom: 2.5rem;
+  }
+  .modal .btn-apply-modal {
+    padding: 1rem 3.5rem;
+    font-size: 1.3rem;
+    font-weight: 800;
+    background: #ffde59;
+    color: #1e3c72;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 10px 35px #ffde59dd;
+    text-decoration: none;
+    display: inline-block;
+    transition: background-color 0.3s ease;
+    user-select: none;
+  }
+  .modal .btn-apply-modal:hover,
+  .modal .btn-apply-modal:focus {
+    background-color: #e6c84b;
+    outline: none;
+  }
+  .modal .btn-close {
+    position: absolute;
+    top: 1rem;
+    right: 1.5rem;
+    font-size: 2.8rem;
+    cursor: pointer;
+    color: #ffd63faa;
+    border: none;
+    background: transparent;
+    user-select: none;
+    transition: color 0.25s ease;
+    line-height: 1;
+  }
+  .modal .btn-close:hover,
+  .modal .btn-close:focus {
+    color: #fff;
+    outline: none;
+  }
+  /* Scrollbar customization */
+  .filter-options::-webkit-scrollbar {
+    width: 7px;
+  }
+  .filter-options::-webkit-scrollbar-thumb {
+    background-color: #ffde59aa;
+    border-radius: 4px;
+  }
+  /* Responsive */
+  @media (max-width: 960px) {
+    .filters-sidebar {
+      width: 100%;
+      position: relative;
+      top: 0;
+      margin-bottom: 30px;
+      padding-bottom: 1rem;
+    }
+    .jobs-wrapper {
+      flex-direction: column;
+      gap: 2rem;
+    }
+  }
+  @media (max-width: 560px) {
+    nav {
+      justify-content: center;
+    }
+    header {
+      justify-content: center;
+    }
+    header h1 {
+      flex-basis: 100%;
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    .filters-container {
+      justify-content: center;
+      margin-left: 0;
+      gap: 1rem;
+      flex-grow: unset;
+    }
+    .search-input, .filter-select, .filter-multi {
+      min-width: auto;
+      flex-grow: 1;
+      max-width: 100%;
+      width: 100%;
+    }
+  }
+  footer {
+    text-align: center;
+    color: #ffde59cc;
+    padding: 1.4rem 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    user-select: none;
+    background: #121f47ee;
+    letter-spacing: 0.05em;
+  }
+  footer a {
+    color: #fff49e;
+    font-weight: 700;
+    text-decoration: none;
+    border-bottom: 1.8px solid transparent;
+    transition: border-color 0.3s ease;
+  }
+  footer a:hover {
+    border-color: #fff49e;
+    text-decoration: underline;
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Lowongan Pekerjaan</h1>
+  <nav aria-label="Main navigation">
+    <button id="btnAll" class="active" aria-pressed="true">All Jobs</button>
+    <button id="btnSaved" aria-pressed="false">Saved Jobs</button>
+  </nav>
+</header>
+
+<main>
+  <section class="search-panel" aria-label="Job Search Filters">
+    <input type="search" id="searchInput" class="search-input" placeholder="Search by title, company, or keywords" aria-label="Search jobs" autocomplete="off" />
+    <select id="sortSelect" class="filter-select" aria-label="Sort Jobs">
+      <option value="relevance" selected>Sort by Relevance</option>
+      <option value="salaryAsc">Salary: Low to High</option>
+      <option value="salaryDesc">Salary: High to Low</option>
+      <option value="locationAsc">Location: A-Z</option>
+      <option value="locationDesc">Location: Z-A</option>
+    </select>
+  </section>
+  <section class="filters" aria-label="Job Filters">
+    <div class="filter-group" id="filterType">
+      <h3>Job Type</h3>
+      <div class="filter-options" role="group" aria-labelledby="filterType">
+        <label><input type="checkbox" value="Full-time" /> Full-time</label>
+        <label><input type="checkbox" value="Part-time" /> Part-time</label>
+        <label><input type="checkbox" value="Contract" /> Contract</label>
+        <label><input type="checkbox" value="Remote" /> Remote</label>
+        <label><input type="checkbox" value="Internship" /> Internship</label>
+      </div>
+    </div>
+    <div class="filter-group" id="filterCategory">
+      <h3>Categories</h3>
+      <div class="filter-options" role="group" aria-labelledby="filterCategory">
+        <label><input type="checkbox" value="Accounting/Finance" /> Accounting/Finance</label>
+        <label><input type="checkbox" value="Admin/Clerical" /> Admin/Clerical</label>
+        <label><input type="checkbox" value="Advertising/PR/Events" /> Advertising/PR/Events</label>
+        <label><input type="checkbox" value="Architecture/Interior Design" /> Architecture/Interior Design</label>
+        <label><input type="checkbox" value="Arts/Creative/Design" /> Arts/Creative/Design</label>
+        <label><input type="checkbox" value="Building/Construction" /> Building/Construction</label>
+        <label><input type="checkbox" value="Customer Service" /> Customer Service</label>
+        <label><input type="checkbox" value="Education/Training" /> Education/Training</label>
+        <label><input type="checkbox" value="Engineering" /> Engineering</label>
+        <label><input type="checkbox" value="Hospitality/F&B/Travel" /> Hospitality/F&amp;B/Travel</label>
+        <label><input type="checkbox" value="Human Resources" /> Human Resources</label>
+        <label><input type="checkbox" value="IT/Computer - Hardware" /> IT/Computer - Hardware</label>
+        <label><input type="checkbox" value="IT/Computer - Software" /> IT/Computer - Software</label>
+        <label><input type="checkbox" value="Legal" /> Legal</label>
+        <label><input type="checkbox" value="Manufacturing/Operations" /> Manufacturing/Operations</label>
+        <label><input type="checkbox" value="Marketing/Business Development" /> Marketing/Business Development</label>
+        <label><input type="checkbox" value="Medical/Healthcare" /> Medical/Healthcare</label>
+        <label><input type="checkbox" value="Other" /> Other</label>
+        <label><input type="checkbox" value="Purchasing/Logistics" /> Purchasing/Logistics</label>
+        <label><input type="checkbox" value="Quality Assurance" /> Quality Assurance</label>
+        <label><input type="checkbox" value="Research/Science" /> Research/Science</label>
+        <label><input type="checkbox" value="Sales/Business Development" /> Sales/Business Development</label>
+        <label><input type="checkbox" value="Secretary/PA" /> Secretary/PA</label>
+        <label><input type="checkbox" value="Telecoms" /> Telecoms</label>
+        <label><input type="checkbox" value="Trade/Services" /> Trade/Services</label>
+      </div>
+    </div>
+    <div class="filter-group" id="filterLocation">
+      <h3>Locations</h3>
+      <div class="filter-options" role="group" aria-labelledby="filterLocation" id="locationFilterOptions">
+        <!-- dynamically populated -->
+      </div>
+    </div>
+    <div class="filter-group" id="filterSalary">
+      <h3>Salary Range (Million IDR)</h3>
+      <div class="filter-options">
+        <label><input type="checkbox" value="0-5" /> 0 - 5</label>
+        <label><input type="checkbox" value="5-10" /> 5 - 10</label>
+        <label><input type="checkbox" value="10-15" /> 10 - 15</label>
+        <label><input type="checkbox" value="15-25" /> 15 - 25</label>
+        <label><input type="checkbox" value="25+" /> 25+</label>
+      </div>
+    </div>
+  </section>
+
+  <section class="jobs-list" aria-live="polite" aria-label="Job listings" id="jobList" tabindex="0">
+    <!-- Job cards inserted here -->
+  </section>
+
+  <nav class="pagination" aria-label="Pagination controls" id="paginationNav">
+    <!-- Pagination buttons inserted here -->
+  </nav>
+</main>
+
+<div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="modalJobTitle" tabindex="-1">
+  <div class="modal" role="document">
+    <button class="btn-close" aria-label="Close modal" id="modalCloseBtn">&times;</button>
+    <h2 id="modalJobTitle"></h2>
+    <div class="company" id="modalCompany"></div>
+    <div class="job-info">
+      <span id="modalLocation"></span>
+      <span id="modalType"></span>
+      <span id="modalSalary"></span>
+    </div>
+    <div class="tags" id="modalTags"></div>
+    <div class="description" id="modalDescription"></div>
+    <a href="#" target="_blank" rel="noopener noreferrer" class="btn-apply-modal" id="modalApplyBtn">Apply Now</a>
+  </div>
+</div>
+
+<footer>
+  &copy; 2025 Lowongan Pekerjaan. All rights reserved. &bull;
+  Contact us: <a href="mailto:contact@lowonganpekerjaan.com" target="_blank" rel="noopener">contact@lowonganpekerjaan.com</a> &bull; 
+  Phone: <a href="tel:+622112345678" target="_blank" rel="noopener">+6285855775095</a>
+</footer>
+
+<script>
+  const jobs = [
+    {
+      id: 1,
+      title: "Senior Frontend Developer",
+      company: "Tech Innovations Ltd.",
+      location: "Jakarta",
+      salaryRange: [12, 18],
+      salaryText: "Rp 12,000,000 - Rp 18,000,000",
+      type: "Full-time",
+      categories: ["IT/Computer - Software"],
+      description: "Lead development of scalable and robust web applications using React, TypeScript and other modern tools. Collaborate with design and backend teams to ensure smooth integration and great UX.\n\nRequirements:\n- 5+ years in frontend development\n- Strong React and TypeScript skills\n- Experience with Redux, GraphQL, and REST APIs",
+      applyUrl: "https://example.com/apply/1",
+    },
+    {
+      id: 2,
+      title: "UX/UI Designer",
+      company: "Creative Studio",
+      location: "Bandung",
+      salaryRange: [8, 13],
+      salaryText: "Rp 8,000,000 - Rp 13,000,000",
+      type: "Contract",
+      categories: ["Arts/Creative/Design"],
+      description: "Design compelling user interfaces, wireframes, prototypes, and ensure a seamless and delightful user experience. Work closely with frontend developers to implement your designs.\n\nRequirements:\n- Proven portfolio of web and mobile designs\n- Proficiency in design tools like Figma, Sketch or Adobe XD",
+      applyUrl: "https://example.com/apply/2",
+    },
+    {
+      id: 3,
+      title: "Data Analyst",
+      company: "Data Solutions",
+      location: "Surabaya",
+      salaryRange: [9, 14],
+      salaryText: "Rp 9,000,000 - Rp 14,000,000",
+      type: "Full-time",
+      categories: ["IT/Computer - Software", "Accounting/Finance"],
+      description: "Analyze large datasets to derive actionable insights. Create and maintain dashboards and reports for business stakeholders.\n\nSkills:\n- SQL and Python\n- Data visualization tools (Tableau, Power BI)",
+      applyUrl: "https://example.com/apply/3",
+    },
+    {
+      id: 4,
+      title: "Digital Marketing Specialist",
+      company: "BrandBoost",
+      location: "Jakarta",
+      salaryRange: [7, 11],
+      salaryText: "Rp 7,000,000 - Rp 11,000,000",
+      type: "Full-time",
+      categories: ["Marketing/Business Development"],
+      description: "Develop and execute digital marketing campaigns across channels including social media, email, and Google Ads.\n\nExperience with SEO, SEM, and analytics is essential.",
+      applyUrl: "https://example.com/apply/4",
+    },
+    {
+      id: 5,
+      title: "Mobile Developer (iOS/Android)",
+      company: "AppWorks",
+      location: "Yogyakarta",
+      salaryRange: [11, 16],
+      salaryText: "Rp 11,000,000 - Rp 16,000,000",
+      type: "Full-time",
+      categories: ["IT/Computer - Software"],
+      description: "Develop high-quality native and cross-platform mobile apps. Work with backend teams to integrate APIs and enhance app performance.\n\nSkills:\n- Swift, Kotlin\n- Flutter or React Native is a plus",
+      applyUrl: "https://example.com/apply/5",
+    },
+    {
+      id: 6,
+      title: "Part-time Customer Support",
+      company: "Retail Corp",
+      location: "Bandung",
+      salaryRange: [3, 5],
+      salaryText: "Rp 3,000,000 - Rp 5,000,000",
+      type: "Part-time",
+      categories: ["Customer Service", "Sales/Business Development"],
+      description: "Provide exceptional support to customers via phone, chat, and email. Resolve issues quickly and maintain high customer satisfaction.",
+      applyUrl: "https://example.com/apply/6",
+    },
+    {
+      id: 7,
+      title: "Healthcare Assistant",
+      company: "HealthCarePlus",
+      location: "Malang",
+      salaryRange: [7, 12],
+      salaryText: "Rp 7,000,000 - Rp 12,000,000",
+      type: "Full-time",
+      categories: ["Medical/Healthcare"],
+      description: "Assist healthcare professionals with patient care, document management, and clinic operations. Great opportunity for compassionate individuals starting their healthcare career.",
+      applyUrl: "https://example.com/apply/7",
+    },
+    {
+      id: 8,
+      title: "Remote Software Tester",
+      company: "Global Tech",
+      location: "Remote",
+      salaryRange: [10, 14],
+      salaryText: "Rp 10,000,000 - Rp 14,000,000",
+      type: "Remote",
+      categories: ["IT/Computer - Software"],
+      description: "Perform manual and automated testing on software products to ensure quality and eliminate bugs before release.\n\nExperience with Selenium or similar tools preferred.",
+      applyUrl: "https://example.com/apply/8",
+    },
+  ];
+  let filteredJobs = [...jobs];
+  const jobsPerPage = 4;
+  let currentPage = 1;
+  const jobList = document.getElementById('jobList');
+  const searchInput = document.getElementById('searchInput');
+  const sortSelect = document.getElementById('sortSelect');
+  const paginationNav = document.getElementById('paginationNav');
+  const modalBackdrop = document.getElementById('modalBackdrop');
+  const modalCloseBtn = document.getElementById('modalCloseBtn');
+  const modalJobTitle = document.getElementById('modalJobTitle');
+  const modalCompany = document.getElementById('modalCompany');
+  const modalLocation = document.getElementById('modalLocation');
+  const modalType = document.getElementById('modalType');
+  const modalSalary = document.getElementById('modalSalary');
+  const modalTags = document.getElementById('modalTags');
+  const modalDescription = document.getElementById('modalDescription');
+  const modalApplyBtn = document.getElementById('modalApplyBtn');
+  const filterTypeInputs = document.querySelectorAll('#filterType input[type=checkbox]');
+  const filterCategoryInputs = document.querySelectorAll('#filterCategory input[type=checkbox]');
+  const filterSalaryInputs = document.querySelectorAll('#filterSalary input[type=checkbox]');
+  const locationFilterOptions = document.getElementById('locationFilterOptions');
+  let savedJobs = new Set(JSON.parse(localStorage.getItem('savedJobs') || '[]'));
+  function debounce(fn, delay) {
+    let timer = null;
+    return function(...args) {
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => fn.apply(this, args), delay);
+    };
+  }
+  function populateLocationFilters() {
+    const locations = Array.from(new Set(jobs.map(job => job.location))).sort((a,b) => a.localeCompare(b));
+    locations.forEach(loc => {
+      const label = document.createElement('label');
+      label.innerHTML = `<input type="checkbox" value="${loc}" /> ${loc}`;
+      locationFilterOptions.appendChild(label);
+    });
+  }
+  populateLocationFilters();
+  function addLocationListeners() {
+    const locationInputs = document.querySelectorAll('#filterLocation input[type=checkbox]');
+    locationInputs.forEach(input => input.addEventListener('change', applyFiltersAndSort));
+  }
+  addLocationListeners();
+  function renderJobs() {
+    jobList.innerHTML = '';
+    if (filteredJobs.length === 0) {
+      jobList.innerHTML = '<p style="grid-column:1/-1; text-align:center; font-style: italic; color:#ffe560; font-size:1.2rem;">No jobs found matching your criteria.</p>';
+      paginationNav.innerHTML = '';
+      return;
+    }
+    const startIdx = (currentPage - 1) * jobsPerPage;
+    const jobsToRender = filteredJobs.slice(startIdx, startIdx + jobsPerPage);
+    jobsToRender.forEach(job => {
+      const card = document.createElement('article');
+      card.className = 'job-card';
+      card.tabIndex = 0;
+      card.setAttribute('role', 'button');
+      card.setAttribute('aria-pressed', 'false');
+      card.dataset.jobId = job.id;
+      const isSaved = savedJobs.has(job.id);
+      const tagsHtml = job.categories.map(tag => `<span class="tag">${tag}</span>`).join('');
+      card.innerHTML = `
+        <div class="job-header">
+          <h3 class="job-title">${job.title}</h3>
+          <div class="company-name">${job.company}</div>
+        </div>
+        <div class="job-info">
+          <span><strong>Location:</strong> ${job.location}</span>
+          <span><strong>Type:</strong> ${job.type}</span>
+          <span><strong>Salary:</strong> ${job.salaryText}</span>
+        </div>
+        <div class="tags">${tagsHtml}</div>
+        <button class="btn-save ${isSaved ? 'saved' : ''}" aria-pressed="${isSaved}" aria-label="${isSaved ? 'Unsave job' : 'Save job'}" tabindex="0">${isSaved ? 'Saved' : 'Save Job'}</button>
+      `;
+      card.addEventListener('click', e => {
+        if(e.target.classList.contains('btn-save')) {
+          toggleSaveJob(job.id, e.target);
+          e.stopPropagation();
+          return;
+        }
+        openJobModal(job);
+      });
+      card.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          if (document.activeElement === card) openJobModal(job);
+        }
+      });
+      const saveBtn = card.querySelector('.btn-save');
+      saveBtn.addEventListener('keydown', e => {
+        if ((e.key === 'Enter' || e.key === ' ') && document.activeElement === saveBtn) {
+          e.preventDefault();
+          toggleSaveJob(job.id, saveBtn);
+        }
+      });
+      jobList.appendChild(card);
+    });
+    renderPagination();
+  }
+  function renderPagination() {
+    const totalPages = Math.ceil(filteredJobs.length / jobsPerPage);
+    if (totalPages <= 1) {
+      paginationNav.innerHTML = '';
+      return;
+    }
+    let html = '';
+    html += `<button ${currentPage === 1 ? 'disabled' : ''} aria-label="Previous page" id="pagePrev">&laquo;</button>`;
+    let startPage = Math.max(1, currentPage - 2);
+    let endPage = Math.min(totalPages, startPage + 4);
+    if (endPage - startPage < 4) {
+      startPage = Math.max(1, endPage - 4);
+    }
+    for (let i = startPage; i <= endPage; i++) {
+      html += `<button class="${i===currentPage ? 'current-page' : ''}" aria-current="${i===currentPage ? 'page' : false}" aria-label="Page ${i}" data-page="${i}">${i}</button>`;
+    }
+    html += `<button ${currentPage === totalPages ? 'disabled' : ''} aria-label="Next page" id="pageNext">&raquo;</button>`;
+    paginationNav.innerHTML = html;
+    document.getElementById('pagePrev').addEventListener('click', () => {
+      if (currentPage > 1) {
+        currentPage--;
+        renderJobs();
+        jobList.focus();
+      }
+    });
+    document.getElementById('pageNext').addEventListener('click', () => {
+      if (currentPage < totalPages) {
+        currentPage++;
+        renderJobs();
+        jobList.focus();
+      }
+    });
+    paginationNav.querySelectorAll('button[data-page]').forEach(button => {
+      button.addEventListener('click', e => {
+        const page = Number(e.target.dataset.page);
+        if (page !== currentPage) {
+          currentPage = page;
+          renderJobs();
+          jobList.focus();
+        }
+      });
+    });
+  }
+  function openJobModal(job) {
+    modalJobTitle.textContent = job.title;
+    modalCompany.textContent = job.company;
+    modalLocation.textContent = "Location: " + job.location;
+    modalType.textContent = "Type: " + job.type;
+    modalSalary.textContent = "Salary: " + job.salaryText;
+    modalDescription.textContent = job.description;
+    modalTags.innerHTML = job.categories.map(c => `<span class="tag">${c}</span>`).join('');
+    modalApplyBtn.href = job.applyUrl;
+    modalApplyBtn.setAttribute('aria-label', 'Apply for ' + job.title + ' at ' + job.company);
+    modalBackdrop.classList.add('active');
+    modalBackdrop.setAttribute('aria-hidden', 'false');
+    modalCloseBtn.focus();
+  }
+  function closeModal() {
+    modalBackdrop.classList.remove('active');
+    modalBackdrop.setAttribute('aria-hidden', 'true');
+  }
+  function toggleSaveJob(jobId, btn) {
+    if (savedJobs.has(jobId)) {
+      savedJobs.delete(jobId);
+      btn.classList.remove('saved');
+      btn.textContent = 'Save Job';
+      btn.setAttribute('aria-pressed', 'false');
+      btn.setAttribute('aria-label', 'Save job');
+    } else {
+      savedJobs.add(jobId);
+      btn.classList.add('saved');
+      btn.textContent = 'Saved';
+      btn.setAttribute('aria-pressed', 'true');
+      btn.setAttribute('aria-label', 'Unsave job');
+    }
+    localStorage.setItem('savedJobs', JSON.stringify(Array.from(savedJobs)));
+  }
+  function applyFiltersAndSort() {
+    const searchTerm = searchInput.value.trim().toLowerCase();
+    const selectedTypes = Array.from(filterTypeInputs).filter(i => i.checked).map(i => i.value);
+    const selectedCategories = Array.from(filterCategoryInputs).filter(i => i.checked).map(i => i.value);
+    const selectedLocations = Array.from(document.querySelectorAll('#filterLocation input[type=checkbox]')).filter(i => i.checked).map(i => i.value);
+    const selectedSalaryRanges = Array.from(filterSalaryInputs).filter(i => i.checked).map(i => i.value);
+    filteredJobs = jobs.filter(job => {
+      if (searchTerm) {
+        const searchTarget = (job.title + ' ' + job.company + ' ' + job.description).toLowerCase();
+        if (!searchTarget.includes(searchTerm)) return false;
+      }
+      if (selectedTypes.length && !selectedTypes.includes(job.type)) return false;
+      if (selectedCategories.length && !job.categories.some(c => selectedCategories.includes(c))) return false;
+      if (selectedLocations.length && !selectedLocations.includes(job.location)) return false;
+      if (selectedSalaryRanges.length) {
+        let matchSalary = false;
+        for (const range of selectedSalaryRanges) {
+          if (range === '25+') {
+            if (job.salaryRange[1] >= 25) {
+              matchSalary = true;
+              break;
+            }
+          } else {
+            const [min, max] = range.split('-').map(Number);
+            if (
+              (job.salaryRange[0] >= min && job.salaryRange[0] <= max) ||
+              (job.salaryRange[1] >= min && job.salaryRange[1] <= max) ||
+              (job.salaryRange[0] <= min && job.salaryRange[1] >= max)
+            ) {
+              matchSalary = true;
+              break;
+            }
+          }
+        }
+        if (!matchSalary) return false;
+      }
+      return true;
+    });
+    applySort();
+    currentPage = 1;
+    renderJobs();
+  }
+  function applySort() {
+    const sortValue = sortSelect.value;
+    switch (sortValue) {
+      case 'salaryAsc':
+        filteredJobs.sort((a,b) => a.salaryRange[0] - b.salaryRange[0]);
+        break;
+      case 'salaryDesc':
+        filteredJobs.sort((a,b) => b.salaryRange[1] - a.salaryRange[1]);
+        break;
+      case 'locationAsc':
+        filteredJobs.sort((a,b) => a.location.localeCompare(b.location));
+        break;
+      case 'locationDesc':
+        filteredJobs.sort((a,b) => b.location.localeCompare(a.location));
+        break;
+      case 'relevance':
+      default:
+        break;
+    }
+  }
+  const onSearchInput = debounce(() => {
+    applyFiltersAndSort();
+  }, 350);
+  searchInput.addEventListener('input', onSearchInput);
+  sortSelect.addEventListener('change', () => {
+    applyFiltersAndSort();
+  });
+  filterTypeInputs.forEach(input => input.addEventListener('change', applyFiltersAndSort));
+  filterCategoryInputs.forEach(input => input.addEventListener('change', applyFiltersAndSort));
+  function addLocationListeners() {
+    const locationInputs = document.querySelectorAll('#filterLocation input[type=checkbox]');
+    locationInputs.forEach(input => input.addEventListener('change', applyFiltersAndSort));
+  }
+  addLocationListeners();
+  filterSalaryInputs.forEach(input => input.addEventListener('change', applyFiltersAndSort));
+  modalCloseBtn.addEventListener('click', closeModal);
+  modalBackdrop.addEventListener('click', e => {
+    if (e.target === modalBackdrop) closeModal();
+  });
+  document.addEventListener('keydown', e => {
+    if ((e.key === 'Escape' || e.key === 'Esc') && modalBackdrop.classList.contains('active')) {
+      closeModal();
+    }
+  });
+  applyFiltersAndSort();
+
+  // Additional feature: Saved Jobs toggle
+  const btnAll = document.getElementById('btnAll');
+  const btnSaved = document.getElementById('btnSaved');
+
+  btnAll.addEventListener('click', () => {
+    btnAll.classList.add('active');
+    btnAll.setAttribute('aria-pressed', 'true');
+    btnSaved.classList.remove('active');
+    btnSaved.setAttribute('aria-pressed', 'false');
+
+    applyFiltersAndSort();
+  });
+
+  btnSaved.addEventListener('click', () => {
+    btnSaved.classList.add('active');
+    btnSaved.setAttribute('aria-pressed', 'true');
+    btnAll.classList.remove('active');
+    btnAll.setAttribute('aria-pressed', 'false');
+
+    const savedArray = Array.from(savedJobs);
+    filteredJobs = jobs.filter(job => savedArray.includes(job.id));
+    currentPage = 1;
+    renderJobs();
+  });
+</script>
+</body>
+</html>
+
